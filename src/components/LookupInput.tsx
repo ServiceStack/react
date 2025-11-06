@@ -33,7 +33,7 @@ const LookupInput: React.FC<LookupInputProps> = ({
   const useLabel = useMemo(() => label ?? humanize(toPascalCase(id)), [label, id])
 
   const errorField = useMemo(() =>
-    errorResponse.call({ responseStatus: status ?? ctx?.error?.value }, id),
+    errorResponse.call({ responseStatus: status ?? ctx?.error }, id),
     [status, ctx, id]
   )
 
@@ -45,7 +45,7 @@ const LookupInput: React.FC<LookupInputProps> = ({
   )
 
   const icon = useMemo(() =>
-    getTypeOf(property?.ref?.model)?.icon || config.value.tableIcon,
+    getTypeOf(property?.ref?.model)?.icon || config.tableIcon,
     [property, config]
   )
 
@@ -126,7 +126,7 @@ const LookupInput: React.FC<LookupInputProps> = ({
       if (refIdValue == null)
         return
 
-      const queryOp = metadataApi?.value?.operations.find(x => x.dataModel?.name === refInfo.model)
+      const queryOp = metadataApi?.operations.find(x => x.dataModel?.name === refInfo.model)
       console.debug('LookupInput queryOp', queryOp)
       if (queryOp != null) {
         const propValue = mapGet(model, prop.name)
@@ -153,10 +153,10 @@ const LookupInput: React.FC<LookupInputProps> = ({
             }
           } else {
             const isComputed = prop.attributes?.some(x => x.name === 'Computed') === true
-            if (client && metadataApi?.value) {
+            if (client && metadataApi) {
               let label = await LookupValues.getOrFetchValue(
                 client,
-                metadataApi.value,
+                metadataApi,
                 refInfo.model,
                 refInfo.refId,
                 refInfo.refLabel,

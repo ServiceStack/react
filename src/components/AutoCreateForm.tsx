@@ -119,7 +119,7 @@ const AutoCreateForm = forwardRef<AutoCreateFormRef, AutoCreateFormProps & AutoC
   const [api, setApi] = useState<ApiResponse>(new ApiResult<any>())
 
   const client = useClient()
-  const loading = useMemo(() => client.loading.value, [client.loading.value])
+  const loading = useMemo(() => client.loading, [client.loading])
 
   useEffect(() => {
     if (Sole.interceptors.has('AutoCreateForm.new')) {

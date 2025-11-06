@@ -204,7 +204,7 @@ export async function swrApi<TResponse>(client:JsonServiceClient, request:IRetur
 }
 
 export function createDebounce(fn:Function, delayMs?:number) {
-    let timeout:number|null = null;
+    let timeout:ReturnType<typeof setTimeout>|null = null;
     return (...args:any[]) => {
         if (timeout) clearTimeout(timeout);
         timeout = setTimeout(() => {

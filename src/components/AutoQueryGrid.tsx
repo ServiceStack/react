@@ -125,7 +125,7 @@ export const AutoQueryGrid = forwardRef<AutoQueryGridRef, AutoQueryGridComponent
 
     const { config, autoQueryGridDefaults } = useConfig()
     const aqd = autoQueryGridDefaults
-    const storage = config.value.storage!
+    const storage = config.storage!
 
     // State
     const [columns, setColumns] = useState<Column[]>([])
@@ -154,13 +154,13 @@ export const AutoQueryGrid = forwardRef<AutoQueryGridRef, AutoQueryGridComponent
 
     // Computed values
     const allowOptions = useMemo<{ [k: string]: boolean }>(
-        () => props.deny ? asOptions(allAllow, props.deny) : asOptions(allAllow, aqd.value.deny),
-        [props.deny, aqd.value.deny]
+        () => props.deny ? asOptions(allAllow, props.deny) : asOptions(allAllow, aqd.deny),
+        [props.deny, aqd.deny]
     )
 
     const showOptions = useMemo<{ [k: string]: boolean }>(
-        () => props.hide ? asOptions(allShow, props.hide) : asOptions(allShow, aqd.value.hide),
-        [props.hide, aqd.value.hide]
+        () => props.hide ? asOptions(allShow, props.hide) : asOptions(allShow, aqd.hide),
+        [props.hide, aqd.hide]
     )
 
     const allow = useCallback((target: GridAllowOptions) => {
@@ -171,7 +171,7 @@ export const AutoQueryGrid = forwardRef<AutoQueryGridRef, AutoQueryGridComponent
         return showOptions[target]
     }, [showOptions])
 
-    const tableStyle = useMemo(() => props.tableStyle ?? aqd.value.tableStyle, [props.tableStyle, aqd.value.tableStyle])
+    const tableStyle = useMemo(() => props.tableStyle ?? aqd.tableStyle, [props.tableStyle, aqd.tableStyle])
     const gridClass = useMemo(() => props.gridClass ?? grid.getGridClass(tableStyle), [props.gridClass, tableStyle])
     const grid2Class = useMemo(() => props.grid2Class ?? grid.getGrid2Class(tableStyle), [props.grid2Class, tableStyle])
     const grid3Class = useMemo(() => props.grid3Class ?? grid.getGrid3Class(tableStyle), [props.grid3Class, tableStyle])
@@ -202,10 +202,10 @@ export const AutoQueryGrid = forwardRef<AutoQueryGridRef, AutoQueryGridComponent
         let opNames = asStrings(props.apis)
         return opNames.length > 0
             ? Apis.from(opNames.map(x => apiOf(x)).filter(x => x != null).map(x => x!))
-            : Apis.forType(typeName, metadataApi.value)
-    }, [props.apis, typeName, metadataApi.value, apiOf])
+            : Apis.forType(typeName, metadataApi)
+    }, [props.apis, typeName, metadataApi, apiOf])
 
-    const definitions = useMemo(() => props.filterDefinitions || filterDefinitions.value, [props.filterDefinitions, filterDefinitions.value])
+    const definitions = useMemo(() => props.filterDefinitions || filterDefinitions, [props.filterDefinitions, filterDefinitions])
 
     const viewModel = useMemo(() => typeOf(apis.AnyQuery?.viewModel?.name || apis.AnyQuery?.dataModel.name), [apis, typeOf])
 
@@ -267,7 +267,7 @@ export const AutoQueryGrid = forwardRef<AutoQueryGridRef, AutoQueryGridComponent
     const warn = (msg: string) => `<span class="text-yellow-700">${msg}</span>`
 
     const invalidState = useMemo(() => {
-        if (!metadataApi.value)
+        if (!metadataApi)
             return warn(`AppMetadata not loaded, see <a class="${a.blue}" href="https://docs.servicestack.net/vue/use-metadata" target="_blank">useMetadata()</a>`)
         let opNames = asStrings(props.apis)
         let invalidApis = opNames.map(op => apiOf(op) == null ? op : null).filter(x => x != null)
@@ -279,7 +279,7 @@ export const AutoQueryGrid = forwardRef<AutoQueryGridRef, AutoQueryGridComponent
         if (!aq.AnyQuery)
             return warn(`No Query API was found`)
         return null
-    }, [metadataApi.value, props.apis, apis, apiOf])
+    }, [metadataApi, props.apis, apis, apiOf])
 
     const invalidAccess = useMemo(() => apis.AnyQuery && invalidAccessMessage(apis.AnyQuery), [apis.AnyQuery, invalidAccessMessage])
     const invalidCreateAccess = useMemo(() => apis.Create && invalidAccessMessage(apis.Create), [apis.Create, invalidAccessMessage])

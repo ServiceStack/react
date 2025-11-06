@@ -3,7 +3,7 @@ import type { ComponentType } from "react"
 import { getFormatters } from "./formatters"
 import { enumFlagsConverter } from "./metadata"
 import { createBus, toKebabCase } from "@servicestack/client"
-import RouterLink from '../components/RouterLink'
+import { RouterLink } from '../components/RouterLink'
 
 export class Interceptors {
     callbacks:{ [key:string]: (key:string, value:any) => void} = {}

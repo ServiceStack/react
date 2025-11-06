@@ -266,6 +266,7 @@ export interface DataGridProps {
     type?: string|InstanceType<any>|Function
     tableStyle?: TableStyleOptions
     selectedColumns?:string[]|string
+    className?: string
     gridClass?: string
     grid2Class?: string
     grid3Class?: string
@@ -366,6 +367,7 @@ export interface BreadcrumbProps {
 // Utility Components
 export interface LoadingProps {
   imageClass?: string
+  className?: string
   children?: ReactNode
 }
 
@@ -381,6 +383,7 @@ export interface IconProps {
 export interface AlertProps {
     type?: "warn" | "info" | "error" | "success",
     hideIcon?: boolean
+    className?: string
     children?: ReactNode
 }
 
@@ -487,6 +490,7 @@ export interface SettingsIconsProps {
 export interface FilterViewsProps {
   definitions?: any[]
   columns?: any[]
+  className?: string
 }
 
 export interface FilterColumnProps {

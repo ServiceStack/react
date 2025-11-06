@@ -98,7 +98,7 @@ const AutoForm = forwardRef<AutoFormRef, AutoFormProps & AutoFormSlots>((props, 
 
   const [model, setModel] = useState(resolveModel())
 
-  const loading = useMemo(() => client.loading.value, [client.loading.value])
+  const loading = useMemo(() => client.loading, [client.loading])
   const title = useMemo(() => heading != null ? heading : (metaType?.description || humanize(typeName)), [heading, metaType, typeName])
 
   const forceUpdate = useCallback(() => {

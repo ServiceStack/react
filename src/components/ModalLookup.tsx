@@ -10,16 +10,16 @@ import { grid } from './css'
 import { canAccess } from '@/use/auth'
 import ModalDialog from './ModalDialog'
 
-// Note: These components need to be converted from Vue to React
-// For now, importing as placeholders - replace with actual React components when available
-const FilterColumn = React.lazy(() => import('./grids/FilterColumn.vue' as any))
-const FilterViews = React.lazy(() => import('./grids/FilterViews.vue' as any))
-const QueryPrefs = React.lazy(() => import('./grids/QueryPrefs.vue' as any))
-const DataGrid = React.lazy(() => import('./DataGrid.vue' as any))
-const AutoCreateForm = React.lazy(() => import('./AutoCreateForm.vue' as any))
+const FilterColumn = React.lazy(() => import('./grids/FilterColumn'))
+const FilterViews = React.lazy(() => import('./grids/FilterViews'))
+const QueryPrefs = React.lazy(() => import('./grids/QueryPrefs'))
+const DataGrid = React.lazy(() => import('./DataGrid'))
+const AutoCreateForm = React.lazy(() => import('./AutoCreateForm'))
+const AutoEditForm = React.lazy(() => import('./AutoEditForm'))
+const ConfirmDelete = React.lazy(() => import('./ConfirmDelete'))
 const ErrorSummary = React.lazy(() => import('./ErrorSummary'))
 const Loading = React.lazy(() => import('./Loading'))
-const SettingsIcons = React.lazy(() => import('./grids/SettingsIcons.vue' as any))
+const SettingsIcons = React.lazy(() => import('./grids/SettingsIcons'))
 
 const asStrings = (o?: string | string[] | null) => typeof o == 'string' ? o.split(',') : o || []
 
@@ -66,7 +66,7 @@ export default function ModalLookup({
     [propToolbarButtonClass]
   )
 
-  const definitions = useMemo(() => filterDefinitions.value, [filterDefinitions])
+  const definitions = useMemo(() => filterDefinitions, [filterDefinitions])
   const defaultTake = 25
 
   const viewModel = useMemo(() => typeOf(refInfo.model), [refInfo.model])
@@ -114,14 +114,14 @@ export default function ModalLookup({
   const primaryKey = useMemo(() => getPrimaryKey(viewModel), [viewModel])
 
   const queryOp = useMemo(() =>
-    metadataApi.value?.operations.find(op =>
+    metadataApi?.operations.find(op =>
       op.dataModel?.name == refInfo.model && Crud.isAnyQuery(op)
     ),
     [metadataApi, refInfo.model]
   )
 
   const typeName = useMemo(() => getTypeName(refInfo.model), [refInfo.model])
-  const apis = useMemo(() => Apis.forType(typeName, metadataApi.value), [typeName, metadataApi])
+  const apis = useMemo(() => Apis.forType(typeName, metadataApi), [typeName, metadataApi])
   const dataModelName = useMemo(() => typeName || queryOp?.dataModel.name, [typeName, queryOp])
   const modelTitle = useMemo(() => propModelTitle || dataModelName, [propModelTitle, dataModelName])
   const newButtonLabel = useMemo(() => propNewButtonLabel || `New ${modelTitle}`, [propNewButtonLabel, modelTitle])

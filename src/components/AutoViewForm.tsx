@@ -59,7 +59,7 @@ const AutoViewForm: React.FC<AutoViewFormProps & AutoViewFormSlots> = (props) =>
   const [origModel] = useState(() => Object.assign({}, toFormValues(model)))
 
   const client = useClient()
-  const loading = useMemo(() => client.loading.value, [client.loading.value])
+  const loading = useMemo(() => client.loading, [client.loading])
 
   const getPk = useCallback(() => map(metaType, (dataModel: any) => getPrimaryKey(dataModel)), [metaType, getPrimaryKey])
   const dataModel = useMemo(() => metaType, [metaType])

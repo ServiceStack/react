@@ -125,7 +125,7 @@ const AutoEditForm = forwardRef<AutoEditFormRef, AutoEditFormProps & AutoEditFor
   const [origModel] = useState(() => Object.assign({}, toFormValues(modelValue)))
 
   const client = useClient()
-  const loading = useMemo(() => client.loading.value, [client.loading.value])
+  const loading = useMemo(() => client.loading, [client.loading])
 
   const getPk = useCallback(() => map(typeOf(Crud.model(metaType)), (dataModel: any) => getPrimaryKey(dataModel)), [metaType, typeOf, Crud, getPrimaryKey])
 

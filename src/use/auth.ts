@@ -97,7 +97,7 @@ export function useAuth() {
 
     useEffect(() => {
         const unsubscribe = Sole.subscribe(() => setUpdateCounter(c => c + 1))
-        return unsubscribe
+        return () => { unsubscribe() }
     }, [])
 
     /** Access the currently Authenticated User info */
