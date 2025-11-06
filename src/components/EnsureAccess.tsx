@@ -1,0 +1,41 @@
+import React from 'react'
+import type { EnsureAccessProps } from '@/components/types'
+import { useAuth } from '@/use/auth'
+import { useConfig } from '@/use/config'
+import { appendQueryString } from "@servicestack/client"
+import Alert from './Alert'
+import SecondaryButton from './SecondaryButton'
+
+export default function EnsureAccess({ invalidAccess, alertClass, children }: EnsureAccessProps) {
+  const { isAuthenticated } = useAuth()
+  const { config } = useConfig()
+
+  const signIn = () => {
+    let redirect = location.href.substring(location.origin.length) || '/'
+    const loginUrl = appendQueryString(config.value.redirectSignIn!, { redirect })
+    config.value.navigate!(loginUrl)
+  }
+
+  const signOut = () => {
+    let ReturnUrl = location.href.substring(location.origin.length) || '/'
+    const logoutUrl = appendQueryString(config.value.redirectSignOut!, { ReturnUrl })
+    config.value.navigate!(logoutUrl)
+  }
+
+  if (!invalidAccess) return null
+
+  return (
+    <div>
+      <Alert className={alertClass}>
+        <span dangerouslySetInnerHTML={{ __html: invalidAccess }} />
+      </Alert>
+      <div className="md:p-4">
+        {!isAuthenticated.value ? (
+          <SecondaryButton onClick={signIn}>Sign In</SecondaryButton>
+        ) : (
+          <SecondaryButton onClick={signOut}>Sign Out</SecondaryButton>
+        )}
+      </div>
+    </div>
+  )
+}

@@ -1,17 +1,17 @@
-// Vue Component Type Definitions
-import type { Component, StyleValue } from 'vue'
+// React Component Type Definitions
+import type { ReactNode, CSSProperties } from 'react'
 import type { Apis } from '../use/metadata'
-import type { 
-  ResponseStatus, MetadataOperationType, InputProp, TableStyleOptions, Breakpoint, ApiRequest, MetadataType, 
-  InputInfo, AutoQueryConvention, ApiPrefs, GridAllowOptions, GridShowOptions, MetadataPropertyType, 
-  ApiResponseType, UploadedFile, ImageInfo, MarkdownInputOptions, RefInfo, FormatInfo, Column, AuthenticateResponse, 
+import type {
+  ResponseStatus, MetadataOperationType, InputProp, TableStyleOptions, Breakpoint, ApiRequest, MetadataType,
+  InputInfo, AutoQueryConvention, ApiPrefs, GridAllowOptions, GridShowOptions, MetadataPropertyType,
+  ApiResponseType, UploadedFile, ImageInfo, MarkdownInputOptions, RefInfo, FormatInfo, Column, AuthenticateResponse,
   ColumnSettings
 } from '@/types'
 
 // Input Components
 export interface TextInputProps {
   status?: ResponseStatus|null
-  id: string      
+  id: string
   type?: string
   inputClass?: string
   filterClass?:(cls:string) => string
@@ -19,9 +19,10 @@ export interface TextInputProps {
   labelClass?: string
   help?: string
   placeholder?: string
-  modelValue?: string|number
+  value?: string|number
+  onChange?: (value:string|number) => void
 }
-export interface TextInputExpose {
+export interface TextInputRef {
   focus(): void
 }
 
@@ -34,13 +35,14 @@ export interface TextareaInputProps {
   labelClass?: string
   help?: string
   placeholder?: string
-  modelValue?: string
+  value?: string
+  onChange?: (value:string) => void
 }
 
 export interface SelectInputProps {
   status?: ResponseStatus
   id: string
-  modelValue?: string
+  value?: string
   inputClass?: string
   filterClass?:(cls:string) => string
   label?: string
@@ -48,32 +50,11 @@ export interface SelectInputProps {
   options?: any
   values?: string[]
   entries?: { key:string, value:string }[]
-}
-
-export type EmitsUpdateModelValue<T> = {
-  (e: "update:modelValue", value:T): void
-}
-export type EmitsSuccess = {
-  (e:'success', response:any): void
-}
-export type EmitsSave = {
-  (e:'save', response:any): void
-}
-export type EmitsDelete = {
-  (e:'delete', response:any): void
-}
-export type EmitsError = {
-  (e:'error', error:ResponseStatus): void
-}
-export type EmitsDone = {
-  (e:'done'): void
-}
-export type EmitsClose = {
-  (e:'close'): void
+  onChange?: (value:string) => void
 }
 
 export interface CheckboxInputProps {
-  modelValue?: boolean
+  value?: boolean
   status?: ResponseStatus
   id: string
   inputClass?: string
@@ -81,8 +62,8 @@ export interface CheckboxInputProps {
   label?: string
   labelClass?: string
   help?: string
+  onChange?: (value:boolean) => void
 }
-export type CheckboxInputEmits = EmitsUpdateModelValue<boolean>
 
 export interface FileInputProps {
   multiple?: boolean
@@ -94,32 +75,45 @@ export interface FileInputProps {
   labelClass?: string
   help?: string
   placeholder?: string
-  modelValue?: string
+  value?: string
   values?:string[]
   files?:UploadedFile[]
+  onChange?: (value:string) => void
 }
 
 // Button Components
-export interface PrimaryButtonProps { 
+export interface PrimaryButtonProps {
   type?: "submit" | "button" | "reset"
   href?: string
   color?: "blue" | "purple" | "red" | "green" | "sky" | "cyan" | "indigo"
+  onClick?: () => void
+  children?: ReactNode
+  className?: string
+  disabled?: boolean
 }
 
-export interface SecondaryButtonProps { 
+export interface SecondaryButtonProps {
   type?: "submit" | "button" | "reset"
-  href?: string 
+  href?: string
+  onClick?: () => void
+  children?: ReactNode
+  className?: string
+  disabled?: boolean
 }
 
-export interface OutlineButtonProps { 
+export interface OutlineButtonProps {
   type?: "submit" | "button" | "reset"
-  href?: string 
+  href?: string
+  onClick?: () => void
+  children?: ReactNode
+  className?: string
+  disabled?: boolean
 }
 
 // Form Components
 export interface AutoFormProps {
     type: string|InstanceType<any>|Function
-    modelValue?: ApiRequest|any
+    value?: ApiRequest|any
     heading?: string
     subHeading?: string
     showLoading?: boolean
@@ -139,9 +133,12 @@ export interface AutoFormProps {
     subHeadingClass?: string
     submitLabel?: string
     allowSubmit?: (model:any) => boolean
-}
 
-export type AutoFormEmits = EmitsSuccess & EmitsError & EmitsDone & EmitsUpdateModelValue<any>
+    onSuccess?: (response:any) => void
+    onError?: (error:ResponseStatus) => void
+    onDone?: () => void
+    onChange?: (value:any) => void
+}
 
 export interface AutoFormBaseProps {
   type: string|InstanceType<any>|Function
@@ -158,19 +155,20 @@ export interface AutoFormBaseProps {
   showCancel?: boolean
   configureField?: (field:InputProp) => void
   configureFormLayout?: (field:InputProp[]) => void
+  onDone?: () => void
+  onSave?: (response:any) => void
+  onError?: (error:ResponseStatus) => void
 }
 
 export interface AutoCreateFormProps extends AutoFormBaseProps {
   // Inherits all AutoFormProps
 }
-export type AutoCreateFormEmits = EmitsDone & EmitsSave & EmitsError
 
 export interface AutoEditFormProps extends AutoFormBaseProps {
-  modelValue: any
+  value: any
   deleteType?: string|InstanceType<any>|Function
+  onDelete?: (response:any) => void
 }
-export type AutoEditFormEmits = EmitsDone & EmitsSave & EmitsDelete & EmitsError
-
 
 export interface AutoViewFormProps {
   model: any
@@ -186,8 +184,11 @@ export interface AutoViewFormProps {
   subHeading?: string
   showLoading?: boolean
   deleteType?: string|InstanceType<any>|Function
+  onDone?: () => void
+  onSave?: (response:any) => void
+  onDelete?: (response:any) => void
+  onError?: (error:ResponseStatus) => void
 }
-export type AutoViewFormEmits = EmitsDone & EmitsSave & EmitsDelete & EmitsError
 
 // Additional Input Components
 export interface TagInputProps {
@@ -199,14 +200,14 @@ export interface TagInputProps {
   label?: string
   labelClass?: string
   help?: string
-  modelValue?: string|string[]
+  value?: string|string[]
   delimiters?: string[]
   allowableValues?: string[]
   string?: boolean
   maxVisibleItems?: number
   converter?: (value:any) => string|string[]
+  onChange?: (value:string|string[]) => void
 }
-export type TagInputEmits = EmitsUpdateModelValue<string|string[]>
 
 export interface AutocompleteProps {
   status?: ResponseStatus|null
@@ -218,45 +219,45 @@ export interface AutocompleteProps {
   multiple?: boolean
   required?: boolean
   options?: any[]
-  modelValue?: any
+  value?: any
   match:(item:any,value:string) => boolean
   viewCount?: number
   pageSize?: number
+  onChange?: (value:any[]|any) => void
 }
-export type AutocompleteEmits = EmitsUpdateModelValue<any[]|any>
 
 export interface ComboboxProps {
     id: string
-    modelValue?: any,
+    value?: any,
     multiple?: boolean,
     options?: any
     values?: string[]
     entries?: { key:string, value:string }[],
+    onChange?: (value:any[]|any) => void
 }
-export type ComboboxEmits = EmitsUpdateModelValue<any[]|any>
 
-export interface ComboboxExpose { 
+export interface ComboboxRef {
   toggle(expand:boolean): void
 }
 
 export interface DynamicInputProps {
   input: InputProp|InputInfo
-  modelValue: ApiRequest
+  value: ApiRequest
   api: ApiResponseType|null
+  onChange?: (value:any) => void
 }
-export type DynamicInputEmits = EmitsUpdateModelValue<any>
 
 export interface LookupInputProps {
   id?: string
   status?: ResponseStatus|null
   input: InputProp|InputInfo
   metadataType: MetadataType
-  modelValue: any
+  value: any
   label?: string
   labelClass?: string
   help?: string
+  onChange?: (value:any) => void
 }
-export type LookupInputEmits = EmitsUpdateModelValue<any>
 
 // Grid Components
 export interface DataGridProps {
@@ -279,12 +280,9 @@ export interface DataGridProps {
     headerTitles?: {[name:string]:string}
     visibleFrom?: {[name:string]:Breakpoint|"never"}
     rowClass?:(model:any,i:number) => string
-    rowStyle?:(model:any,i:number) => StyleValue | undefined
-}
-
-export interface DataGridEmits {
-    (e:"headerSelected", name:string, ev:Event): void
-    (e:"rowSelected", item:any, ev:Event): void
+    rowStyle?:(model:any,i:number) => CSSProperties | undefined
+    onHeaderSelected?: (name:string, ev:React.MouseEvent) => void
+    onRowSelected?: (item:any, ev:React.MouseEvent) => void
 }
 
 export interface AutoQueryGridProps {
@@ -296,7 +294,7 @@ export interface AutoQueryGridProps {
 
     deny?: string|GridAllowOptions|GridAllowOptions[]
     hide?: string|GridShowOptions|GridShowOptions[]
-    
+
     selectedColumns?:string[]|string
     toolbarButtonClass?: string
     tableStyle?: TableStyleOptions
@@ -314,7 +312,7 @@ export interface AutoQueryGridProps {
     headerTitles?: {[name:string]:string}
     visibleFrom?: {[name:string]:Breakpoint|"never"}
     rowClass?:(model:any,i:number) => string
-    rowStyle?:(model:any,i:number) => StyleValue | undefined
+    rowStyle?:(model:any,i:number) => CSSProperties | undefined
     modelTitle?: string
     newButtonLabel?: string
 
@@ -326,11 +324,10 @@ export interface AutoQueryGridProps {
     create?: boolean
     edit?: string|number
     filters?: any
-}
-export interface AutoQueryGridEmits {
-    (e: "headerSelected", name:string, ev:Event): void
-    (e: "rowSelected", item:any, ev:Event): void
-    (e: "nav", args:any): void
+
+    onHeaderSelected?: (name:string, ev:React.MouseEvent) => void
+    onRowSelected?: (item:any, ev:React.MouseEvent) => void
+    onNav?: (args:any) => void
 }
 
 // Modal Components
@@ -340,30 +337,36 @@ export interface ModalDialogProps {
   sizeClass?: string
   closeButtonClass?: string
   configureField?: (field:InputProp) => void
+  children?: ReactNode
+  onDone?: () => void
 }
-export type ModalDialogEmits = EmitsDone
 
 export interface SlideOverProps {
   id?: string
   title?: string
+  subtitle?: string
   contentClass?: string
+  children?: ReactNode
+  onDone?: () => void
 }
-export type SlideOverEmits = EmitsDone
 
 // Navigation Components
 export interface BreadcrumbsProps {
   homeHref?: string
   homeLabel?: string
+  children?: ReactNode
 }
 
 export interface BreadcrumbProps {
   href?: string
   title?: string
+  children?: ReactNode
 }
 
 // Utility Components
 export interface LoadingProps {
   imageClass?: string
+  children?: ReactNode
 }
 
 export interface IconProps {
@@ -372,11 +375,13 @@ export interface IconProps {
   src?: string
   alt?: string
   type?: string
+  className?: string
 }
 
 export interface AlertProps {
     type?: "warn" | "info" | "error" | "success",
     hideIcon?: boolean
+    children?: ReactNode
 }
 
 export interface AlertSuccessProps {
@@ -386,12 +391,12 @@ export interface AlertSuccessProps {
 export interface ErrorSummaryProps {
   status?: ResponseStatus|undefined,
   except?: string | string[]
-  class?: string
+  className?: string
 }
 
 // Form Components
 export interface AutoFormFieldsProps {
-  modelValue: ApiRequest
+  value: ApiRequest
   type?: string
   metaType?: MetadataType
   api: {error?:ResponseStatus}|null
@@ -403,13 +408,11 @@ export interface AutoFormFieldsProps {
   divideClass?: string
   spaceClass?: string
   fieldsetClass?: string
+  onChange?: (value:any) => void
 }
-export type AutoFormFieldsEmits = EmitsUpdateModelValue<any>
 
 export interface ConfirmDeleteProps {
-}
-export interface ConfirmDeleteEmits {
-  (e:'delete'): void
+  onDelete?: () => void
 }
 
 export interface FormLoadingProps {
@@ -421,7 +424,7 @@ export interface FormLoadingProps {
 export interface CellFormatProps {
   type: MetadataType,
   propType: MetadataPropertyType,
-  modelValue: Object
+  value: Object
 }
 
 export interface PreviewFormatProps {
@@ -459,10 +462,12 @@ export interface InputDescriptionProps {
 
 export interface TextLinkProps {
   color?: "blue" | "purple" | "red" | "green" | "sky" | "cyan" | "indigo"
+  children?: ReactNode
 }
 
 export interface NavListProps {
   title?: string
+  children?: ReactNode
 }
 
 export interface NavListItemProps {
@@ -488,9 +493,8 @@ export interface FilterColumnProps {
     definitions: AutoQueryConvention[]
     column: Column
     topLeft: { x:number, y:number }
-}
-export type FilterColumnEmits = EmitsDone & {
-  (e:'save', settings:ColumnSettings): () => void
+    onDone?: () => void
+    onSave?: (settings:ColumnSettings) => void
 }
 
 export interface QueryPrefsProps {
@@ -498,30 +502,30 @@ export interface QueryPrefsProps {
     columns: MetadataPropertyType[]
     prefs: ApiPrefs
     maxLimit?: number
-}
-export type QueryPrefsEmits = EmitsDone & {
-  (e:'save', prefs:ApiPrefs): () => void
+    onDone?: () => void
+    onSave?: (prefs:ApiPrefs) => void
 }
 
 export interface EnsureAccessProps {
   invalidAccess?: string
   alertClass?: string
+  children?: ReactNode
+  onDone?: () => void
 }
-export type EnsureAccessEmits = EmitsDone
 
 export interface EnsureAccessDialogProps {
   title?: string
   subtitle?: string
   invalidAccess?: string
   alertClass?: string
+  onDone?: () => void
 }
-export type EnsureAccessDialogEmits = EmitsDone
 
 export interface CloseButtonProps {
   buttonClass?: string
   title?: string
+  onClose?: () => void
 }
-export type CloseButtonEmits = EmitsClose
 
 export interface ModalLookupProps {
   id?: string
@@ -544,14 +548,11 @@ export interface ModalLookupProps {
   modelTitle?: string
   newButtonLabel?: string
   configureField?: (field:InputProp) => void
-}
-export interface ModalLookupEmits {
-    // (e: "headerSelected", name:string, ev:Event): void
-    (e: "done", item:any): void
+  onDone?: (item:any) => void
 }
 
 export interface TabsProps {
-    tabs: {[name:string]:Component }
+    tabs: {[name:string]:React.ComponentType }
     id?: string
     param?: string
     label?: (tab:string) => string
@@ -567,9 +568,7 @@ export interface SignInProps {
   title?: string
   tabs?: boolean|"false"
   oauth?: boolean|"false"
-}
-export interface SignInEmits {
-  (e:'login', auth:AuthenticateResponse): void
+  onLogin?: (auth:AuthenticateResponse) => void
 }
 
 export interface MarkdownInputProps {
@@ -581,7 +580,7 @@ export interface MarkdownInputProps {
   labelClass?: string
   help?: string
   placeholder?: string
-  modelValue?: string
+  value?: string
 
   counter?: boolean
   rows?: number
@@ -592,11 +591,12 @@ export interface MarkdownInputProps {
   disabled?: boolean
   helpUrl?: string
   hide?: string|MarkdownInputOptions|MarkdownInputOptions[]
+  onChange?: (value:string) => void
+  onClose?: () => void
 }
-export type MarkdownInputEmits = EmitsUpdateModelValue<string> & EmitsClose
 
-export interface SidebarLayoutExpose { 
-  show(): void 
-  hide(): void 
-  toggle(show:boolean): void 
+export interface SidebarLayoutRef {
+  show(): void
+  hide(): void
+  toggle(show:boolean): void
 }
