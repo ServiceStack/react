@@ -1,6 +1,5 @@
-import type { Ref } from "vue"
+import type { MutableRefObject } from "react"
 import type { JsonServiceClient } from "@servicestack/client"
-import { isRef, nextTick, unref } from "vue"
 import type { ApiRequest, IReturn, TransitionRules } from "@/types"
 import { ApiResult, appendQueryString, enc, lastLeftPart, nameOf, omit, setQueryString, toDate, toTime } from "@servicestack/client"
 import { assetsPathResolver } from "./config"
@@ -41,29 +40,31 @@ export function textInputValue(type:string, value:any) {
 }
 
 
-/** Double set reactive Ref<T> to force triggering updates */
-export function setRef($ref:Ref<any>, value:any) {
-    $ref.value = null
-    nextTick(() => $ref.value = value)
-}
-  
-/** Returns a dto with all Refs unwrapped */
-export function unRefs(o:any) {
-    Object.keys(o).forEach(k => {
-        const val = o[k]
-        o[k] = isRef(val) ? unref(val) : val
-    })
-    return o
+/** Set React ref or state value - for React compatibility, just sets the value directly */
+export function setRef<T>($ref: MutableRefObject<T> | ((value: T) => void), value: T) {
+    if (typeof $ref === 'function') {
+        // It's a setState function
+        $ref(value)
+    } else {
+        // It's a React ref
+        $ref.current = value
+    }
 }
 
-/** Update reactive `transition` class based on Tailwind animation transition rule-set */
-export function transition(rule:TransitionRules, transition:Ref<string>, show:boolean) {
+/** Returns a dto with all properties unwrapped - for React, just returns a shallow copy */
+export function unRefs<T extends Record<string, any>>(o: T): T {
+    // In React, we don't have Vue refs, so just return a shallow copy
+    return { ...o }
+}
+
+/** Update transition class based on Tailwind animation transition rule-set */
+export function transition(rule: TransitionRules, setTransition: (value: string) => void, show: boolean) {
     if (show) {
-        transition.value = rule.entering.cls + ' ' + rule.entering.from
-        setTimeout(() => transition.value = rule.entering.cls + ' ' + rule.entering.to, 0)
+        setTransition(rule.entering.cls + ' ' + rule.entering.from)
+        setTimeout(() => setTransition(rule.entering.cls + ' ' + rule.entering.to), 0)
     } else {
-        transition.value = rule.leaving.cls + ' ' + rule.leaving.from
-        setTimeout(() => transition.value = rule.leaving.cls + ' ' + rule.leaving.to, 0)
+        setTransition(rule.leaving.cls + ' ' + rule.leaving.from)
+        setTimeout(() => setTransition(rule.leaving.cls + ' ' + rule.leaving.to), 0)
     }
 }
 

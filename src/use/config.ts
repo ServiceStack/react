@@ -1,12 +1,12 @@
 import type { AppMetadata, AuthenticateResponse, AutoQueryGridDefaults, UiConfig } from "@/types"
-import { ref, computed, type Component } from "vue"
+import type { ComponentType } from "react"
 import { getFormatters } from "./formatters"
 import { enumFlagsConverter } from "./metadata"
 import { createBus, toKebabCase } from "@servicestack/client"
-import RouterLink from '../components/RouterLink.vue'
+import RouterLink from '../components/RouterLink'
 
 export class Interceptors {
-    callbacks:{ [key:string]: (key:string, value:any) => void} = {}    
+    callbacks:{ [key:string]: (key:string, value:any) => void} = {}
 
     public register(key:string, callback:(key:string, value:any) => void) {
         this.callbacks[key] = callback
@@ -14,7 +14,7 @@ export class Interceptors {
 
     public has(key:string) { return !!this.callbacks[key] }
 
-    public invoke(key:string, value:any) { 
+    public invoke(key:string, value:any) {
         const cb = this.callbacks[key]
         if (typeof cb == 'function') {
             cb(key, value)
@@ -47,6 +47,11 @@ export class LocalStore implements Storage {
     }
 }
 
+// State holder for React
+let userState: AuthenticateResponse | null = null
+let metadataState: AppMetadata | null = null
+let subscribers: Set<() => void> = new Set()
+
 export class Sole {
     static config:UiConfig = {
         redirectSignIn: '/signin',
@@ -72,9 +77,31 @@ export class Sole {
     }
 
     static events = createBus()
-    static user = ref<AuthenticateResponse|null>(null)
-    static metadata = ref<AppMetadata|null>(null)
-    static components:{[k:string]:Component} = {
+
+    static get user() {
+        return userState
+    }
+
+    static set user(value: AuthenticateResponse | null) {
+        userState = value
+        subscribers.forEach(cb => cb())
+    }
+
+    static get metadata() {
+        return metadataState
+    }
+
+    static set metadata(value: AppMetadata | null) {
+        metadataState = value
+        subscribers.forEach(cb => cb())
+    }
+
+    static subscribe(callback: () => void) {
+        subscribers.add(callback)
+        return () => subscribers.delete(callback)
+    }
+
+    static components:{[k:string]:ComponentType} = {
         RouterLink,
     }
     static component(name:string) {
@@ -116,15 +143,16 @@ export function registerInterceptor(key:string, callback:(key:string, value:any)
 
 /** Manage Global Configuration for Component Library */
 export function useConfig() {
-    /** Resolve configuration in a reactive Ref<UiConfig> */
-    const config = computed(() => Sole.config)
-    const autoQueryGridDefaults = computed(() => Sole.autoQueryGridDefaults)
     const events = Sole.events
 
-    return { 
-        config, setConfig, events,
-        autoQueryGridDefaults, setAutoQueryGridDefaults, 
-        assetsPathResolver, fallbackPathResolver,
+    return {
+        config: Sole.config,
+        setConfig,
+        events,
+        autoQueryGridDefaults: Sole.autoQueryGridDefaults,
+        setAutoQueryGridDefaults,
+        assetsPathResolver,
+        fallbackPathResolver,
         registerInterceptor,
     }
 }

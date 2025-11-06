@@ -1,4 +1,4 @@
-import type { Ref, UnwrapRef } from "vue"
+// React doesn't need Ref or UnwrapRef types - we use direct types instead
 
 export type FormStyle = "slideOver" | "card"
 export type TableStyle = "simple" | "fullWidth" | "stripedRows" | "whiteBackground" | "uppercaseHeadings" | "verticalLines"
@@ -62,18 +62,17 @@ export interface IResponseStatus extends IResponseError {
 }
 
 export type ApiState = {
-    unRefs: (o:any) => any
-    setRef: ($ref:Ref<any>, $item:any) => void
+    unRefs: <T extends Record<string, any>>(o: T) => T
     setError: ({ message, errorCode, fieldName, errors }: IResponseStatus) => ResponseStatus
     addFieldError: ({ fieldName, message, errorCode }: IResponseError) => void
-    loading: Ref<boolean>
-    error: Ref<any>
+    loading: boolean
+    error: ResponseStatus | undefined
     api: <TResponse>(request: IReturn<TResponse> | ApiRequest, args?: any, method?: string) => Promise<ApiResult<TResponse>>
     apiVoid: (request: IReturnVoid | ApiRequest, args?: any, method?: string) => Promise<ApiResult<EmptyResponse>>
     apiForm: <TResponse>(request: ApiRequest | IReturn<TResponse>, body: FormData, args?: any, method?: string) => Promise<ApiResult<TResponse>>
     apiFormVoid: (request: IReturnVoid | ApiRequest, body: FormData, args?: any, method?: string) => Promise<ApiResult<EmptyResponse>>
     swr: <TResponse>(request:IReturn<TResponse> | ApiRequest, fn:(r:ApiResult<TResponse>) => void, args?: any, method?: string) => Promise<ApiResult<TResponse>>
-    swrEffect: <TResponse>(requestFn: () => IReturn<TResponse> | ApiRequest, options?:{ args?:any, method?:string, delayMs?:number }) => Ref<ApiResult<UnwrapRef<TResponse>>>
+    swrEffect: <TResponse>(requestFn: () => IReturn<TResponse> | ApiRequest, options?:{ args?:any, method?:string, delayMs?:number }) => ApiResult<TResponse>
 }
 
 export type TransitionRule = {
