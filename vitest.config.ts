@@ -1,7 +1,6 @@
-import Vue from "@vitejs/plugin-vue";
+import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
-import { playwright } from "@vitest/browser-playwright";
 
 export default defineConfig({
   resolve: {
@@ -9,14 +8,10 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  plugins: [Vue()],
+  plugins: [react()],
   // @ts-ignore
   test: {
-    browser: {
-      provider: playwright(),
-      enabled: true,
-      // at least one instance is required
-      instances: [{ browser: "chromium" }],
-    },
+    environment: "jsdom",
+    globals: true,
   },
 });
